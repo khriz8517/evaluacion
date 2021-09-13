@@ -1,0 +1,96 @@
+<link rel="stylesheet" href="./css/evaluacion.css" />
+<link rel="stylesheet" href="./css/radiobutton.css" />
+<link
+    href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+    rel="stylesheet"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+    rel="stylesheet"
+/>
+
+<div id="app">
+    <div v-if="ready === true" class="evaluacion-section">
+        <div class="evs-body">
+            <div class="evsb-header">
+                <h1>3. Evaluación</h1>
+                <div class="evsb-settings"></div>
+            </div>
+            <div v-if="pActual === 0" class="evsb-start evsb-height">
+                <div class="panel">
+                    <div class="evsb-start-title">
+                        ¿Listo para probar tus conocimientos?
+                    </div>
+                    <div class="evsb-start-btn">
+                        <button @click="pActual += 1">Comenzar</button>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="pActual > 0 && pActual <= preguntas.length"
+                class="evsb-questions evsb-height"
+            >
+                <div class="col-pb">
+                    <div class="evsb-progress-bar">
+                        <div
+                            class="evsb-progress"
+                            :style="{height: progress+'%'}"
+                        ></div>
+                    </div>
+                    <div class="evsb-horizontal-progress-bar">
+                        <div
+                            class="evsb-horizontal-progress"
+                            :style="{width: progress+'%'}"
+                        ></div>
+                    </div>
+                </div>
+                <div class="col-q">
+                    <div
+                        v-for="(item, index) in preguntas"
+                        v-if="index+1 === pActual"
+                        class="evsb-question"
+                        :key="item.id"
+                    >
+                        <div class="q-title">
+                            {( index + 1 + ". " + item.pregunta )}
+                        </div>
+                        <div class="q-options">
+                            <label
+                                v-for="op in item.opciones"
+                                class="rb-container"
+                                >{( op.opcion )}
+                                <input
+                                    type="radio"
+                                    :name="item.id"
+                                    @click="pActual += 1, opcionMarcada(item, op)"
+                                />
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="pActual > preguntas.length"
+                class="evsb-results evsb-height"
+            >
+                <div class="panel">
+                    <div class="results-title">¡Buen trabajo!</div>
+                    <div class="results-points">
+                        Lograste el {( result )}% del puntaje
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sesskey = "{{sesskey}}";
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="./js/evaluacion.js"></script>
