@@ -22,8 +22,11 @@ try {
 			break;
 		case 'insertResultadoEvaluacion':
 			$puntaje = $_REQUEST['puntaje'];
+			$cursoid = $_REQUEST['cursoid'];
+			$coursemoduleid = $_REQUEST['coursemoduleid'];
+			$module = $_REQUEST['module'];
 			$sesskey = $_REQUEST['sesskey'];
-			$returnArr = insertResultadoEvaluacion($puntaje, $sesskey);
+			$returnArr = insertResultadoEvaluacion($puntaje, $cursoid, $coursemoduleid, $module, $sesskey);
 			break;
 	}
 
@@ -44,9 +47,9 @@ exit();
 function getPreguntasOpcionesEvaluacion(){
 	global $DB, $USER;
 
-	$result = $DB->get_field('aq_eval_user_puntaje_data', 'puntaje_porcentaje', [
-		'userid' => $USER->id
-	]);
+	// $result = $DB->get_field('aq_eval_user_puntaje_data', 'puntaje_porcentaje', [
+	// 	'userid' => $USER->id
+	// ]);
 
 	$data = [];
 
@@ -67,7 +70,7 @@ function getPreguntasOpcionesEvaluacion(){
 
 	$output = [
 		'preguntas' => $data,
-		'result' => $result == false ? 0 : intval($result) 
+		// 'result' => $result == false ? 0 : intval($result) 
 	];
 
 	return $output;
@@ -80,31 +83,28 @@ function getPreguntasOpcionesEvaluacion(){
  * @param puntaje es el puntaje obtenido por el usuario 
  * @param sesskey es la sesion del usuario
  */
-function insertResultadoEvaluacion($puntaje, $sesskey){
+function insertResultadoEvaluacion($puntaje, $cursoid, $coursemoduleid, $module, $sesskey){
 	global $DB, $USER;
 	require_sesskey();
 
-	$if_exists = $DB->get_records('aq_eval_user_puntaje_data', [
-		'userid' => $USER->id
-	]);
+	$if_aproved = $DB->get_records_sql('SELECT * FROM mdl_aq_eval_user_puntaje_data
+                where userid = '.$USER->id.'
+                and moduleid = '.$coursemoduleid.'
+                and module = '.$module.'
+                and course = '.$cursoid.'
+                and puntaje_porcentaje >= 80', []);
 
-	if(count($if_exists)){
-		foreach ($if_exists as $key => $value) {
-			$data = array(
-				'id' => $value->id,
-				'puntaje_porcentaje' => $value->puntaje_porcentaje > 80 ? $value->puntaje_porcentaje : $puntaje,
-				'created_at' => time()
-			);
-			$DB->update_record('aq_eval_user_puntaje_data', $data);
-		}
-		return 'updated';
-	}else{
+	if(count($if_aproved) == 0){
 		$data = array(
 			'userid' => $USER->id,
+			'course' => $cursoid,
+			'module' => $module,
+			'moduleid' => $coursemoduleid,
 			'puntaje_porcentaje' => $puntaje,
 			'created_at' => time()
 		);
 		$insert_id = $DB->insert_record('aq_eval_user_puntaje_data', $data);
-		return 'inserted';
+		return $insert_id;
 	}
+	return 'Ya se aprobo esta evaluacion';
 }

@@ -25,6 +25,11 @@ var app = new Vue({
         result: function () {
             return (this.resp_correctas * 100) / this.preguntas.length;
         },
+        result_title: function () {
+            return this.result >= 80
+                ? "¡Buen trabajo!"
+                : "¡Puedes hacerlo mejor!";
+        },
     },
     watch: {
         pActual: function (newval, oldval) {
@@ -51,6 +56,9 @@ var app = new Vue({
             let frm = new FormData();
             frm.append("request_type", "insertResultadoEvaluacion");
             frm.append("puntaje", this.result);
+            frm.append("cursoid", cursoid);
+            frm.append("coursemoduleid", coursemoduleid);
+            frm.append("module", module);
             frm.append("sesskey", sesskey);
             axios.post("api/ajax_controller.php", frm).then((res) => {
                 console.log(res.data);

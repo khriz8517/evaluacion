@@ -31,13 +31,22 @@ $PAGE->set_title('Evaluacion');
 $PAGE->set_heading('Evaluacion');
 
 $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
+$if_aproved = $DB->get_records_sql('SELECT * FROM mdl_aq_eval_user_puntaje_data
+                where userid = '.$USER->id.'
+                and moduleid = '.$id.'
+                and module = '.$evaluacion->module.'
+                and course = '.$cm->course.'
+                and puntaje_porcentaje >= 80', []);
+
 require_course_login($course, true, $cm);
 
 $templateContext = (object)[
     'sesskey' => sesskey(),
     'cursoid' => $cm->course,
     'coursemoduleid' => $id,
+    'module' => $evaluacion->module,
     'userid' => $USER->id,
+    'if_aproved' => count($if_aproved) > 0 ? 1 : 0
 ];
 
 
