@@ -18,7 +18,17 @@
                 <h1>3. Evaluación</h1>
                 <div class="evsb-settings"></div>
             </div>
-            <div v-if="pActual === 0" class="evsb-start evsb-height">
+            <div v-if="resultDB >= 80" class="evsb-start evsb-height">
+                <div class="panel">
+                    <div class="evsb-start-title">
+                        ¡Usted ya completo esta evaluación!
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="pActual === 0 && resultDB < 80"
+                class="evsb-start evsb-height"
+            >
                 <div class="panel">
                     <div class="evsb-start-title">
                         ¿Listo para probar tus conocimientos?
@@ -81,6 +91,11 @@
                     <div class="results-points">
                         Lograste el {( result )}% del puntaje
                     </div>
+                    <div class="evsb-start-btn">
+                        <a href="{{ url }}/course/view.php?id={{ cursoid }}"
+                            >Regresar al curso</a
+                        >
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,6 +108,7 @@
     const coursemoduleid = "{{coursemoduleid}}";
     const module = "{{module}}";
     const if_aproved = "{{if_aproved}}";
+    const url = "{{url}}";
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>

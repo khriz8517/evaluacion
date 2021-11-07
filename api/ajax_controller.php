@@ -18,7 +18,11 @@ try {
 
 	switch ($_REQUEST['request_type']) {
 		case 'getPreguntasOpcionesEvaluacion':
-			$returnArr = getPreguntasOpcionesEvaluacion();
+			$cursoid = $_REQUEST['cursoid'];
+			$coursemoduleid = $_REQUEST['coursemoduleid'];
+			$module = $_REQUEST['module'];
+			$sesskey = $_REQUEST['sesskey'];
+			$returnArr = getPreguntasOpcionesEvaluacion($cursoid, $coursemoduleid, $module, $sesskey);
 			break;
 		case 'insertResultadoEvaluacion':
 			$puntaje = $_REQUEST['puntaje'];
@@ -44,17 +48,23 @@ exit();
  * getPreguntasOpcionesEvaluacion
  * * obtiene las preguntas de la evaluacion y sus opciones
  */
-function getPreguntasOpcionesEvaluacion(){
+function getPreguntasOpcionesEvaluacion($cursoid, $coursemoduleid, $module, $sesskey){
 	global $DB, $USER;
-
-	// $result = $DB->get_field('aq_eval_user_puntaje_data', 'puntaje_porcentaje', [
-	// 	'userid' => $USER->id
-	// ]);
+	require_sesskey();
+	$result = $DB->get_records('aq_eval_user_puntaje_data', [
+		'userid' => $USER->id,
+		'course' => $cursoid,
+		'moduleid' => $coursemoduleid,
+		'module' => $module,
+	]);
 
 	$data = [];
 
 	$preguntas = $DB->get_records('aq_evaluacion_data', [
-		'active' => 1
+		'active' => 1,
+		'course' => $cursoid,
+		'moduleid' => $coursemoduleid,
+		'module' => $module,
 	]);
 
 	foreach ($preguntas as $key => $value) {
@@ -70,7 +80,7 @@ function getPreguntasOpcionesEvaluacion(){
 
 	$output = [
 		'preguntas' => $data,
-		// 'result' => $result == false ? 0 : intval($result) 
+		'result' => $result == false ? 0 : end($result)->puntaje_porcentaje 
 	];
 
 	return $output;

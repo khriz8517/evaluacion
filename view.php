@@ -46,7 +46,8 @@ $templateContext = (object)[
     'coursemoduleid' => $id,
     'module' => $evaluacion->module,
     'userid' => $USER->id,
-    'if_aproved' => count($if_aproved) > 0 ? 1 : 0
+    'if_aproved' => count($if_aproved) > 0 ? 1 : 0,
+    'url' => $CFG->wwwroot
 ];
 
 
